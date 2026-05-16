@@ -18,7 +18,7 @@ def run(playwright: Playwright):
     sheet = wb.active
     sheet.title = "Job Listings"
     chromium = playwright.chromium
-    browser = chromium.launch(headless=False,  timeout=30000)
+    browser = chromium.launch(headless=True,  timeout=30000)
     page = browser.new_page()
     page.goto("https://remoteok.com/")
     page.wait_for_timeout(5000)
