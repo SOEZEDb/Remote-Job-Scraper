@@ -5,9 +5,15 @@ from openpyxl.styles import Font
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
+import json
 load_dotenv()
 
 def run(playwright: Playwright):
+    if os.path.exists("seen_jobs.json"):
+        with open("seen_jobs.json", "r") as f:
+            seen_jobs = set(json.load(f))
+    else:
+        seen_jobs = set()
     wb = Workbook()
     sheet = wb.active
     sheet.title = "Job Listings"
@@ -46,9 +52,12 @@ def run(playwright: Playwright):
             link_locator = job.locator("a[itemprop='url']")
             links = "https://remoteok.com" + link_locator.get_attribute("href")
             days_posted = job.locator("time").first.inner_text()
-            if "h" in days_posted:
+            if "h" in days_posted and links not in seen_jobs:
                 send_whatsapp(f"New job: {role} at {company} — {links}")
+                seen_jobs.add(links)
             sheet.append([role, company, salary, location, links, days_posted])
+        with open(f"seen_jobs.json", "w") as f:
+            json.dump(list(seen_jobs), f)
         wb.save("Remote Job listings.xlsx")
         break
 
