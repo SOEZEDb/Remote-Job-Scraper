@@ -1,0 +1,2 @@
+nixPkgs = ["playwright-driver"]
+cmds = ["pip install -r requirements.txt", "playwright install chromium"]
